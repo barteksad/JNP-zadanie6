@@ -6,6 +6,7 @@
 #include <vector>
 #include <initializer_list>
 #include <compare>
+#include <memory>
 
 class Command
 {
@@ -15,8 +16,9 @@ private:
 public:
     Command();
 
-    virtual void execute(Position &position, std::vector<Sensor> &sensors) const;
+    virtual void execute(Position &position, const std::vector<std::unique_ptr<Sensor>> &sensors) const;
 
+    std::strong_ordering operator <=> (const char other) const; // (chyba) wtedy można w set'cie ładnie trzymać
     std::strong_ordering operator <=> (const Command & other) const;
 
     void set_name(char _name);
@@ -32,7 +34,7 @@ public:
     ComposedCommand(std::initializer_list<Command> _components)
         : components(_components) {};
 
-    void execute(Position &position, std::vector<Sensor> &sensors) const override;
+    void execute(Position &position, std::vector<std::unique_ptr<Sensor>> &sensors) const override;
 };
 
 

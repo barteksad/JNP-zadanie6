@@ -7,16 +7,16 @@
 
 #include <string>
 #include <memory>
-#include <set>
+#include <map>
 
 class Rover
 {
 private:
     Position position;
-    std::set<Command> commands;
+    std::map<char, Command> commands;
     std::vector<std::unique_ptr<Sensor>> sensors;
 
-    Rover(std::set<Command>& _commands, std::vector<std::unique_ptr<Sensor>>& _sensors)
+    Rover(std::map<char, Command>& _commands, std::vector<std::unique_ptr<Sensor>>& _sensors)
     : commands(_commands), sensors(_sensors) {};
 
 public:
@@ -38,7 +38,7 @@ public:
             if(it == commands.end())
                 throw UnknownCommand();
             else
-                it->execute(position, sensors);
+                it->second.execute(position, sensors);
         }
 
     }
@@ -49,14 +49,13 @@ public:
 class RoverBuilder
 {
 private:
-    std::set<Command> commands;
+    std::map<char, Command> commands;
     std::vector<std::unique_ptr<Sensor>> sensors;
 
 public:
     void program_command(char name, Command& command)
     {
-        command.set_name(name);
-        commands.insert(command);
+        commands.insert({name, command});
     }
 
     void add_sensor(std::unique_ptr<Sensor> &&sensor)

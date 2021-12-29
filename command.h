@@ -11,17 +11,12 @@
 class Command
 {
 private:
-    char name;
 
 public:
     Command();
 
     virtual void execute(Position &position, const std::vector<std::unique_ptr<Sensor>> &sensors) const;
 
-    std::strong_ordering operator <=> (const char other) const; // (chyba) wtedy można w set'cie ładnie trzymać
-    std::strong_ordering operator <=> (const Command & other) const;
-
-    void set_name(char _name);
 };
 
 class ComposedCommand : public Command

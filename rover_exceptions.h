@@ -13,4 +13,14 @@ class UnknownCommand : public std::exception
 
 };
 
+class RoverHasAlreadyLanded : public std::exception
+{
+
+};
+
+class RoverNotLanded : public std::exception
+{
+
+};
+
 #endif

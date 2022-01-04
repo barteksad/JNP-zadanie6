@@ -3,7 +3,7 @@
 
 enum Direction : int
 {
-    WEST, EAST, SOUTH, NORTH
+    WEST, NORTH, EAST, SOUTH
 };
 
 #endif

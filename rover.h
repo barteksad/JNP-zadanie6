@@ -15,9 +15,11 @@ private:
     Position position;
     std::map<char, Command> commands;
     std::vector<std::unique_ptr<Sensor>> sensors;
+    bool is_broken;
+    bool has_landed;
 
     Rover(std::map<char, Command>& _commands, std::vector<std::unique_ptr<Sensor>>& _sensors)
-    : commands(_commands), sensors(_sensors) {};
+    : commands(_commands), sensors(_sensors), is_broken(false), has_landed(false) {};
 
 public:
     Rover()=delete;
@@ -27,18 +29,37 @@ public:
     template<class... T>
     void land(T... args)
     {
+        if(has_landed)
+            throw RoverHasAlreadyLanded();
+            
         position.set(args);
+        has_landed=true;
     }
 
     void execute(const std::string & s)
     {
+        if(is_broken)
+            return;
+        if(!has_landed)
+            throw RoverNotLanded();
+
         for(char c : s)
         {
             auto it = commands.find(c);
             if(it == commands.end())
                 throw UnknownCommand();
             else
-                it->second.execute(position, sensors);
+            {
+                try
+                {
+                    it->second.execute(position, sensors);
+                }
+                catch(const BrokenRover& br)
+                {
+                    is_broken = true;
+                    return;
+                }
+            }
         }
 
     }

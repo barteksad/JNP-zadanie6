@@ -9,18 +9,82 @@ using coordinate_t = int;
 
 class Position
 {
-    using pos_point_t = std::pair<coordinate_t, coordinate_t>;
-    bool is_set;
-    pos_point_t position;
+    using pos_coords_t = std::pair<coordinate_t, coordinate_t>;
+    pos_coords_t coordinates;
     Direction direction;
 
 public:
-    Position()
-    : is_set(false) {};
-    // Position(pos_point_t _position, Direction _direction);
 
-    pos_point_t get() const;
-    void set(pos_point_t new_position, Direction new_direction);
+    pos_coords_t get_coords() const
+    {
+        return coordinates;
+    }
+
+    Direction get_direction() const
+    {
+        return direction;
+    }
+
+    void set(pos_coords_t new_coordinates, Direction new_direction)
+    {
+        coordinates = new_coordinates;
+        direction = new_direction;
+    }
+
+    void rotate_left()
+    {
+        int tmp = static_cast<int>(direction);
+        tmp-=1;
+        if(tmp < 0)
+            tmp += 4;
+        direction = static_cast<Direction>(tmp);
+    }
+
+    void rotate_right()
+    {
+        int tmp = static_cast<int>(direction);
+        tmp+=1;
+        tmp %= 4;
+        direction = static_cast<Direction>(tmp);
+    }
+
+    void move_forward()
+    {
+        switch(direction)
+        {
+            case WEST:
+                coordinates.first--;
+                break;
+            case NORTH:
+                coordinates.second++;
+                break;
+            case EAST:
+                coordinates.first++;
+                break;
+            case SOUTH:
+                coordinates.second--;
+                break;                
+        }
+    }
+
+    void move_backward()
+    {
+        switch(direction)
+        {
+            case WEST:
+                coordinates.first++;
+                break;
+            case NORTH:
+                coordinates.second--;
+                break;
+            case EAST:
+                coordinates.first--;
+                break;
+            case SOUTH:
+                coordinates.second++;
+                break;                
+        }
+    }
 };
 
 #endif

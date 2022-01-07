@@ -26,13 +26,15 @@ public:
     Rover(const Rover&)=delete;
     Rover(Rover&&)=delete;
 
+    class RoverBuilder;
+
     template<typename... T>
     void land(T... args)
     {
         if(has_landed)
             throw RoverHasAlreadyLanded();
             
-        position.set(args);
+        position.set(args...);
         has_landed=true;
     }
 
@@ -67,13 +69,15 @@ public:
     friend class RoverBuilder;
 };
 
-class RoverBuilder
+class Rover::RoverBuilder
 {
 private:
     std::map<char, Command> commands;
     std::vector<std::unique_ptr<Sensor>> sensors;
 
 public:
+
+    RoverBuilder();
 
     void program_command(char name, Command& command)
     {
@@ -85,12 +89,16 @@ public:
         sensors.emplace_back(sensor);
     }
 
-    Rover&& build()
+    Rover build()
     {
-        Rover rover(commands, sensors);
-        return std::move(rover);
+        return Rover{commands, sensors};
     }
 };
+
+Rover::RoverBuilder RoverBuilder()
+{
+    return Rover::RoverBuilder{};
+}
 
 
 Command& move_forward()

@@ -26,7 +26,7 @@ protected:
         );
     }
 
-    bool check_and_possibly_set(Position &position, Position& unchecked_new_position, const std::vector<std::unique_ptr<Sensor>> &sensors) const
+    void check_and_possibly_set(Position &position, Position& unchecked_new_position, const std::vector<std::unique_ptr<Sensor>> &sensors) const
     {
         bool is_safe = check_safety(unchecked_new_position, sensors);
         if(is_safe)
@@ -57,7 +57,7 @@ public:
         std::for_each(
             components.begin(),
             components.end(),
-            [&] (Command& c) { c.execute(position, sensors); }
+            [&] (const Command& c) { c.execute(position, sensors); }
         );
 
     }

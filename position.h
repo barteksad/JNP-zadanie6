@@ -85,6 +85,15 @@ public:
                 break;                
         }
     }
+
+    friend std::ostream& operator<<(std::ostream& os, const Position& rover);
 };
+
+std::ostream& operator<<(std::ostream& os, const Position& position)
+{
+    os << "("<< position.coordinates.first << ", " <<position.coordinates.second << ") " << position.direction;
+    return os;
+}
+
 
 #endif

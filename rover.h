@@ -3,8 +3,10 @@
 
 #include "sensor.h"
 #include "command.h"
+#include "position.h"
 #include "rover_exceptions.h"
 
+#include <iostream>
 #include <string>
 #include <memory>
 #include <map>
@@ -28,13 +30,12 @@ public:
 
     class RoverBuilder;
 
-    template<typename... T>
-    void land(T... args)
+    void land(std::pair<coordinate_t, coordinate_t> _position, Direction _direction)
     {
         if(has_landed)
             throw RoverHasAlreadyLanded();
             
-        position.set(args...);
+        position.set(_position, _direction);
         has_landed=true;
     }
 
@@ -66,8 +67,16 @@ public:
 
     }
 
+    friend std::ostream& operator<<(std::ostream& os, const Rover& rover);
     friend class RoverBuilder;
 };
+
+std::ostream& operator<<(std::ostream& os, const Rover& rover)
+{
+    os << rover.position;
+    return os;
+}
+
 
 class Rover::RoverBuilder
 {
@@ -94,11 +103,6 @@ public:
         return Rover{commands, sensors};
     }
 };
-
-Rover::RoverBuilder RoverBuilder()
-{
-    return Rover::RoverBuilder{};
-}
 
 
 Command& move_forward()

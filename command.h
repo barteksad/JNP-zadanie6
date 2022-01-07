@@ -49,8 +49,6 @@ private:
     std::vector<Command> components;
 
 public:
-    virtual ~ComposedCommand();
-
     ComposedCommand(std::initializer_list<Command> _components)
         : components(_components) {};
 

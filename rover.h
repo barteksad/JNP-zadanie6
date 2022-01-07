@@ -26,7 +26,7 @@ public:
     Rover(const Rover&)=delete;
     Rover(Rover&&)=delete;
 
-    template<class... T>
+    template<typename... T>
     void land(T... args)
     {
         if(has_landed)
@@ -43,7 +43,7 @@ public:
         if(!has_landed)
             throw RoverNotLanded();
 
-        for(char c : s)
+        for(const char c : s)
         {
             auto it = commands.find(c);
             if(it == commands.end())
@@ -74,6 +74,7 @@ private:
     std::vector<std::unique_ptr<Sensor>> sensors;
 
 public:
+
     void program_command(char name, Command& command)
     {
         commands.insert({name, command});
@@ -84,18 +85,41 @@ public:
         sensors.emplace_back(sensor);
     }
 
-    Rover build()
+    Rover&& build()
     {
-        return Rover(commands, sensors);
+        Rover rover(commands, sensors);
+        return std::move(rover);
     }
 };
 
-// tak chyba będzie ok
+
 Command& move_forward()
 {
     static MoveForward command;
 
     return command;
 }
+
+Command& move_backward()
+{
+    static MoveBackward command;
+
+    return command;
+}
+
+Command& rotate_right()
+{
+    static RotateRight command;
+
+    return command;
+}
+
+Command& rotate_left()
+{
+    static RotateLeft command;
+
+    return command;
+}
+
 
 #endif

@@ -86,16 +86,16 @@ private:
 
 public:
 
-    RoverBuilder();
-
-    void program_command(char name, Command& command)
+    Rover::RoverBuilder& program_command(char name, const Command& command)
     {
         commands.insert({name, command});
+        return *this;
     }
 
-    void add_sensor(std::unique_ptr<Sensor> &&sensor)
+    Rover::RoverBuilder& add_sensor(std::unique_ptr<Sensor> &&sensor)
     {
-        sensors.emplace_back(sensor);
+        sensors.emplace_back(std::move(sensor));
+        return *this;
     }
 
     Rover build()
@@ -104,33 +104,10 @@ public:
     }
 };
 
-
-Command& move_forward()
+Rover::RoverBuilder RoverBuilder()
 {
-    static MoveForward command;
-
-    return command;
-}
-
-Command& move_backward()
-{
-    static MoveBackward command;
-
-    return command;
-}
-
-Command& rotate_right()
-{
-    static RotateRight command;
-
-    return command;
-}
-
-Command& rotate_left()
-{
-    static RotateLeft command;
-
-    return command;
+    Rover::RoverBuilder builder;
+    return builder;
 }
 
 

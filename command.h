@@ -21,7 +21,7 @@ protected:
             [&] (const std::unique_ptr<Sensor> & sensor) 
             {
                 const auto& [x, y] = unchecked_new_position.get_coords();
-                sensor->is_safe(x, y);
+                return sensor->is_safe(x, y);
             }
         );
     }
@@ -104,5 +104,38 @@ class MoveBackward : public Command
         check_and_possibly_set(position, unchecked_new_position, sensors);
     }  
 };
+
+Command& move_forward()
+{
+    static MoveForward command;
+
+    return command;
+}
+
+Command& move_backward()
+{
+    static MoveBackward command;
+
+    return command;
+}
+
+Command& rotate_right()
+{
+    static RotateRight command;
+
+    return command;
+}
+
+Command& rotate_left()
+{
+    static RotateLeft command;
+
+    return command;
+}
+
+// Command& compose(std::initializer_list<Command&> commands)
+// {
+//     static 
+// }
 
 #endif

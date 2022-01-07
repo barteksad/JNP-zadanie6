@@ -46,7 +46,7 @@ public:
 class ComposedCommand : public Command
 {
 private:
-    std::vector<Command> components;
+    std::vector<std::unique_ptr<Command>> components;
 
 public:
     ComposedCommand(std::initializer_list<Command> _components)
@@ -57,7 +57,7 @@ public:
         std::for_each(
             components.begin(),
             components.end(),
-            [&] (const Command& c) { c.execute(position, sensors); }
+            [&] (const std::unique_ptr<Command>& c) { c->execute(position, sensors); }
         );
 
     }
@@ -105,37 +105,29 @@ class MoveBackward : public Command
     }  
 };
 
-Command& move_forward()
+std::unique_ptr<Command> move_forward()
 {
-    static MoveForward command;
-
-    return command;
+    return std::move(std::make_unique<MoveForward>());
 }
 
-Command& move_backward()
+std::unique_ptr<Command> move_backward()
 {
-    static MoveBackward command;
-
-    return command;
+    return std::make_unique<MoveBackward>();
 }
 
-Command& rotate_right()
+std::unique_ptr<Command> rotate_left()
 {
-    static RotateRight command;
-
-    return command;
+    return std::make_unique<RotateLeft>();
 }
 
-Command& rotate_left()
+std::unique_ptr<Command> rotate_right()
 {
-    static RotateLeft command;
-
-    return command;
+    return std::make_unique<RotateRight>();
 }
 
-// Command& compose(std::initializer_list<Command&> commands)
-// {
-//     static 
-// }
+std::unique_ptr<Command> compose(std::initializer_list<std::unique_ptr<Command>> commands)
+{
+    return std::make_unique<ComposedCommand>(commands);
+}
 
 #endif

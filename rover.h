@@ -28,8 +28,6 @@ public:
     Rover(const Rover&)=delete;
     Rover(Rover&&)=delete;
 
-    class RoverBuilder;
-
     void land(std::pair<coordinate_t, coordinate_t> _position, Direction _direction)
     {
         if(has_landed)
@@ -78,7 +76,7 @@ std::ostream& operator<<(std::ostream& os, const Rover& rover)
 }
 
 
-class Rover::RoverBuilder
+class RoverBuilder
 {
 private:
     std::map<char, std::unique_ptr<Command>> commands;
@@ -86,13 +84,13 @@ private:
 
 public:
 
-    Rover::RoverBuilder& program_command(char name, std::unique_ptr<Command> &&command)
+    RoverBuilder& program_command(char name, std::unique_ptr<Command> command)
     {
-        commands.insert({name, std::move(command)});
+        commands.emplace(std::make_pair(name, std::move(command)));
         return *this;
     }
 
-    Rover::RoverBuilder& add_sensor(std::unique_ptr<Sensor> &&sensor)
+    RoverBuilder& add_sensor(std::unique_ptr<Sensor> sensor)
     {
         sensors.emplace_back(std::move(sensor));
         return *this;
@@ -104,11 +102,11 @@ public:
     }
 };
 
-Rover::RoverBuilder RoverBuilder()
-{
-    Rover::RoverBuilder builder;
-    return builder;
-}
+// Rover::RoverBuilder RoverBuilder()
+// {
+//     Rover::RoverBuilder builder;
+//     return builder;
+// }
 
 
 #endif

@@ -49,7 +49,7 @@ private:
     std::vector<std::unique_ptr<Command>> components;
 
 public:
-    ComposedCommand(std::initializer_list<Command> _components)
+    ComposedCommand(std::initializer_list<std::unique_ptr<Command>> _components)
         : components(_components) {};
 
     void execute(Position &position, const std::vector<std::unique_ptr<Sensor>> &sensors) const override
@@ -107,7 +107,7 @@ class MoveBackward : public Command
 
 std::unique_ptr<Command> move_forward()
 {
-    return std::move(std::make_unique<MoveForward>());
+    return std::make_unique<MoveForward>();
 }
 
 std::unique_ptr<Command> move_backward()
@@ -125,9 +125,10 @@ std::unique_ptr<Command> rotate_right()
     return std::make_unique<RotateRight>();
 }
 
-std::unique_ptr<Command> compose(std::initializer_list<std::unique_ptr<Command>> commands)
+template <typename... T>
+std::unique_ptr<Command> compose(T... args)
 {
-    return std::make_unique<ComposedCommand>(commands);
+    return std::make_unique<ComposedCommand>(args...);
 }
 
 #endif

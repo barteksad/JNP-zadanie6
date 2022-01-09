@@ -36,9 +36,8 @@ protected:
     }
 
 public:
-    Command();
-    virtual ~Command();
 
+    virtual ~Command() {}
     virtual void execute(Position &position, const std::vector<std::unique_ptr<Sensor>> &sensors) const;
 
 };
@@ -49,8 +48,11 @@ private:
     std::vector<std::unique_ptr<Command>> components;
 
 public:
-    ComposedCommand(std::initializer_list<std::unique_ptr<Command>> _components)
-        : components(_components) {};
+    ComposedCommand(std::vector<std::unique_ptr<Command>> _components)
+        : components(std::move(_components)) {}
+        // {
+        //     components = std::vector<std::unique_ptr<Command>> {std::make_move_iterator(commands.begin()),std::make_move_iterator(commands.end())};
+        // };
 
     void execute(Position &position, const std::vector<std::unique_ptr<Sensor>> &sensors) const override
     {
@@ -125,10 +127,10 @@ std::unique_ptr<Command> rotate_right()
     return std::make_unique<RotateRight>();
 }
 
-template <typename... T>
-std::unique_ptr<Command> compose(T... args)
+std::unique_ptr<Command> compose(std::vector<std::unique_ptr<Command>>&& components)
 {
-    return std::make_unique<ComposedCommand>(args...);
+    // std::vector<std::unique_ptr<Command>> components{std::make_move_iterator(std::begin(_components)),std::make_move_iterator(std::end(_components))};;
+    return std::make_unique<ComposedCommand>(std::move(components));
 }
 
 #endif

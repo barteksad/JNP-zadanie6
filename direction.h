@@ -24,8 +24,6 @@ inline std::ostream& operator<<(std::ostream& os, const Direction& direction)
         case SOUTH:
             os << "SOUTH";
             break;
-        default:
-            assert(false);
     }
 
     return os;

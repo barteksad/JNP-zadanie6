@@ -20,8 +20,8 @@ private:
     bool is_broken;
     bool has_landed;
 
-    Rover(std::map<char, std::unique_ptr<Command>>&& _commands, std::vector<std::unique_ptr<Sensor>>&& _sensors)
-    : commands(_commands), sensors(_sensors), is_broken(false), has_landed(false) {};
+    Rover(std::map<char, std::unique_ptr<Command>> _commands, std::vector<std::unique_ptr<Sensor>> _sensors)
+    : commands(std::move(_commands)), sensors(std::move(_sensors)), is_broken(false), has_landed(false) {};
 
 public:
     Rover()=delete;
@@ -84,29 +84,26 @@ private:
 
 public:
 
-    RoverBuilder& program_command(char name, std::unique_ptr<Command> command)
+    RoverBuilder() = default;
+    RoverBuilder (const RoverBuilder&& other)=delete;    
+    RoverBuilder (RoverBuilder&& other)=delete;    
+
+    RoverBuilder&& program_command(char name, std::unique_ptr<Command> command) &&
     {
-        commands.emplace(std::make_pair(name, std::move(command)));
-        return *this;
+        commands.emplace(name, std::move(command));
+        return std::move(*this);
     }
 
-    RoverBuilder& add_sensor(std::unique_ptr<Sensor> sensor)
+    RoverBuilder&& add_sensor(std::unique_ptr<Sensor> sensor) &&
     {
         sensors.emplace_back(std::move(sensor));
-        return *this;
+        return std::move(*this);
     }
 
-    Rover build()
+    Rover build() &&
     {
-        return Rover{std::move(commands), std::move(sensors)};
+        return Rover(std::move(commands), std::move(sensors));
     }
 };
-
-// Rover::RoverBuilder RoverBuilder()
-// {
-//     Rover::RoverBuilder builder;
-//     return builder;
-// }
-
 
 #endif

@@ -8,7 +8,7 @@
 #include <memory>
 #include <algorithm>
 
-class Command
+class command
 {
 protected:
 
@@ -37,38 +37,35 @@ protected:
 
 public:
 
-    virtual ~Command() {}
-    virtual void execute(Position &position, const std::vector<std::unique_ptr<Sensor>> &sensors) const;
+    virtual ~command() {}
+    virtual void execute([[maybe_unused]] Position &position, [[maybe_unused]] const std::vector<std::unique_ptr<Sensor>> &sensors) const {};
 
 };
 
-class ComposedCommand : public Command
+class compose : public command
 {
 private:
-    std::vector<std::unique_ptr<Command>> components;
+    std::vector<command> components;
 
 public:
-    ComposedCommand(std::vector<std::unique_ptr<Command>> _components)
-        : components(std::move(_components)) {}
-        // {
-        //     components = std::vector<std::unique_ptr<Command>> {std::make_move_iterator(commands.begin()),std::make_move_iterator(commands.end())};
-        // };
+    compose(std::initializer_list<command> _components)
+        : components(_components) {}
 
     void execute(Position &position, const std::vector<std::unique_ptr<Sensor>> &sensors) const override
     {
         std::for_each(
             components.begin(),
             components.end(),
-            [&] (const std::unique_ptr<Command>& c) { c->execute(position, sensors); }
+            [&] (const command& c) { c.execute(position, sensors); }
         );
 
     }
 };
 
-class RotateRight : public Command
+class rotate_right : public command
 {
 public:
-    void execute(Position &position, const std::vector<std::unique_ptr<Sensor>> &sensors) const
+    void execute(Position &position, const std::vector<std::unique_ptr<Sensor>> &sensors) const override
     {
         Position unchecked_new_position = position;
         unchecked_new_position.rotate_right();
@@ -76,10 +73,10 @@ public:
     }   
 };
 
-class RotateLeft : public Command
+class rotate_left : public command
 {
 public:
-    void execute(Position &position, const std::vector<std::unique_ptr<Sensor>> &sensors) const
+    void execute(Position &position, const std::vector<std::unique_ptr<Sensor>> &sensors) const override
     {
         Position unchecked_new_position = position;
         unchecked_new_position.rotate_left();
@@ -87,9 +84,9 @@ public:
     }   
 };
 
-class MoveForward : public Command
+class move_forward : public command
 {
-    void execute(Position &position, const std::vector<std::unique_ptr<Sensor>> &sensors) const
+    void execute(Position &position, const std::vector<std::unique_ptr<Sensor>> &sensors) const override
     {
         Position unchecked_new_position = position;
         unchecked_new_position.move_forward();
@@ -97,40 +94,14 @@ class MoveForward : public Command
     }  
 };
 
-class MoveBackward : public Command
+class move_backward : public command
 {
-    void execute(Position &position, const std::vector<std::unique_ptr<Sensor>> &sensors) const
+    void execute(Position &position, const std::vector<std::unique_ptr<Sensor>> &sensors) const override
     {
         Position unchecked_new_position = position;
         unchecked_new_position.move_backward();
         check_and_possibly_set(position, unchecked_new_position, sensors);
     }  
 };
-
-std::unique_ptr<Command> move_forward()
-{
-    return std::make_unique<MoveForward>();
-}
-
-std::unique_ptr<Command> move_backward()
-{
-    return std::make_unique<MoveBackward>();
-}
-
-std::unique_ptr<Command> rotate_left()
-{
-    return std::make_unique<RotateLeft>();
-}
-
-std::unique_ptr<Command> rotate_right()
-{
-    return std::make_unique<RotateRight>();
-}
-
-std::unique_ptr<Command> compose(std::vector<std::unique_ptr<Command>>&& components)
-{
-    // std::vector<std::unique_ptr<Command>> components{std::make_move_iterator(std::begin(_components)),std::make_move_iterator(std::end(_components))};;
-    return std::make_unique<ComposedCommand>(std::move(components));
-}
 
 #endif

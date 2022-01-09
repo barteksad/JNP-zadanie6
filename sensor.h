@@ -7,7 +7,7 @@
 class Sensor
 {
 public:
-    virtual bool is_safe([[maybe_unused]] coordinate_t x, [[maybe_unused]] coordinate_t y);
+    virtual bool is_safe([[maybe_unused]] coordinate_t x, [[maybe_unused]] coordinate_t y) {return false;};
     virtual ~Sensor() {};
 };
 

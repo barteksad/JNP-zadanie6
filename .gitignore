@@ -1,1 +1,7 @@
 *.exe
+testy-zad6
+*out
+ok_example.cc
+*.gch
+ok2*
+.vscode

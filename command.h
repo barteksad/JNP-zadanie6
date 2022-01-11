@@ -8,7 +8,7 @@
 #include <memory>
 #include <algorithm>
 
-class command
+class Command
 {
 protected:
 
@@ -37,18 +37,18 @@ protected:
 
 public:
 
-    virtual ~command() {}
+    virtual ~Command() {}
     virtual void execute([[maybe_unused]] Position &position, [[maybe_unused]] const std::vector<std::unique_ptr<Sensor>> &sensors) const {};
 
 };
 
-class compose : public command
+class Compose : public Command
 {
 private:
-    std::vector<command> components;
+    std::vector<std::shared_ptr<Command>> components;
 
 public:
-    compose(std::initializer_list<command> _components)
+    Compose(std::initializer_list<std::shared_ptr<Command>> _components)
         : components(_components) {}
 
     void execute(Position &position, const std::vector<std::unique_ptr<Sensor>> &sensors) const override
@@ -56,13 +56,13 @@ public:
         std::for_each(
             components.begin(),
             components.end(),
-            [&] (const command& c) { c.execute(position, sensors); }
+            [&] (const std::shared_ptr<Command>& c) { c->execute(position, sensors); }
         );
 
     }
 };
 
-class rotate_right : public command
+class RotateRight : public Command
 {
 public:
     void execute(Position &position, const std::vector<std::unique_ptr<Sensor>> &sensors) const override
@@ -73,7 +73,7 @@ public:
     }   
 };
 
-class rotate_left : public command
+class RotateLeft : public Command
 {
 public:
     void execute(Position &position, const std::vector<std::unique_ptr<Sensor>> &sensors) const override
@@ -84,7 +84,7 @@ public:
     }   
 };
 
-class move_forward : public command
+class MoveForward : public Command
 {
     void execute(Position &position, const std::vector<std::unique_ptr<Sensor>> &sensors) const override
     {
@@ -94,7 +94,7 @@ class move_forward : public command
     }  
 };
 
-class move_backward : public command
+class MoveBackward : public Command
 {
     void execute(Position &position, const std::vector<std::unique_ptr<Sensor>> &sensors) const override
     {
@@ -103,5 +103,11 @@ class move_backward : public command
         check_and_possibly_set(position, unchecked_new_position, sensors);
     }  
 };
+
+std::shared_ptr<Command> move_forward();
+std::shared_ptr<Command> move_backward();
+std::shared_ptr<Command> rotate_right();
+std::shared_ptr<Command> rotate_left();
+std::shared_ptr<Command> compose(std::initializer_list<std::shared_ptr<Command>>);
 
 #endif

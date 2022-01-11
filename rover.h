@@ -15,18 +15,15 @@ class Rover
 {
 private:
     Position position;
-    std::map<char, command> commands;
+    std::map<char, std::shared_ptr<Command>> commands;
     std::vector<std::unique_ptr<Sensor>> sensors;
-    bool is_broken;
+    bool has_stopped;
     bool has_landed;
 
-    Rover(std::map<char, command> _commands, std::vector<std::unique_ptr<Sensor>> _sensors)
-    : commands(_commands), sensors(std::move(_sensors)), is_broken(false), has_landed(false) {};
+    Rover(std::map<char, std::shared_ptr<Command>> _commands, std::vector<std::unique_ptr<Sensor>> _sensors)
+    : commands(std::move(_commands)), sensors(std::move(_sensors)), has_stopped(false), has_landed(false) {};
 
 public:
-    Rover()=delete;
-    Rover(const Rover&)=delete;
-    Rover(Rover&&)=delete;
 
     void land(std::pair<coordinate_t, coordinate_t> _position, Direction _direction)
     {          
@@ -36,8 +33,6 @@ public:
 
     void execute(const std::string & s)
     {
-        if(is_broken)
-            return;
         if(!has_landed)
             throw RoverNotLanded();
 
@@ -45,16 +40,20 @@ public:
         {
             auto it = commands.find(c);
             if(it == commands.end())
-                throw UnknownCommand();
+            {
+                has_stopped=true;
+                return;
+            }
             else
             {
                 try
                 {
-                    it->second.execute(position, sensors);
+                    it->second->execute(position, sensors);
+                    has_stopped = false;
                 }
                 catch(const BrokenRover& br)
                 {
-                    is_broken = true;
+                    has_stopped = true;
                     return;
                 }
             }
@@ -66,10 +65,12 @@ public:
     friend class RoverBuilder;
 };
 
+std::ostream& operator<<(std::ostream& os, const Rover& rover);
+
 class RoverBuilder
 {
 private:
-    std::map<char, command> commands;
+    std::map<char, std::shared_ptr<Command>> commands;
     std::vector<std::unique_ptr<Sensor>> sensors;
 
 public:
@@ -78,7 +79,7 @@ public:
     RoverBuilder (const RoverBuilder&& other)=delete;    
     RoverBuilder (RoverBuilder&& other)=delete;    
 
-    RoverBuilder& program_command(char name, command command)
+    RoverBuilder& program_command(char name, std::shared_ptr<Command> command)
     {
         commands.insert({name, command});
         return *this;
@@ -92,7 +93,7 @@ public:
 
     Rover build()
     {
-        return Rover(commands, std::move(sensors));
+        return Rover(std::move(commands), std::move(sensors));
     }
 };
 

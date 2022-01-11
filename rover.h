@@ -29,10 +29,7 @@ public:
     Rover(Rover&&)=delete;
 
     void land(std::pair<coordinate_t, coordinate_t> _position, Direction _direction)
-    {
-        if(has_landed)
-            throw RoverHasAlreadyLanded();
-            
+    {          
         position.set(_position, _direction);
         has_landed=true;
     }

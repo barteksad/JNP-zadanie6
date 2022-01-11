@@ -3,24 +3,25 @@
 
 #include <exception>
 
-class BrokenRover : public std::exception
+class BrokenRover : public std::runtime_error
 {
-
+public:
+    BrokenRover()
+        : std::runtime_error("Rover has broken!") {}
 };
 
-class UnknownCommand : public std::exception
+class UnknownCommand : public std::runtime_error
 {
-
+public:
+    UnknownCommand()
+        : std::runtime_error("Unknown command!") {}
 };
 
-class RoverHasAlreadyLanded : public std::exception
+class RoverNotLanded : public  std::runtime_error
 {
-
-};
-
-class RoverNotLanded : public std::exception
-{
-
+public:
+    RoverNotLanded()
+        : std::runtime_error("Rover has not laned yet!") {}
 };
 
 #endif

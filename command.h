@@ -86,6 +86,7 @@ public:
 
 class MoveForward : public Command
 {
+public:
     void execute(Position &position, const std::vector<std::unique_ptr<Sensor>> &sensors) const override
     {
         Position unchecked_new_position = position;
@@ -96,6 +97,7 @@ class MoveForward : public Command
 
 class MoveBackward : public Command
 {
+public:
     void execute(Position &position, const std::vector<std::unique_ptr<Sensor>> &sensors) const override
     {
         Position unchecked_new_position = position;

@@ -29,6 +29,7 @@ public:
     {          
         position.set(_position, _direction);
         has_landed=true;
+        has_stopped = false;
     }
 
     void execute(const std::string & s)
@@ -81,7 +82,7 @@ public:
 
     RoverBuilder& program_command(char name, std::shared_ptr<Command> command)
     {
-        commands.insert({name, command});
+        commands[name] = command;
         return *this;
     }
 
